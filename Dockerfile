@@ -1,12 +1,14 @@
-FROM python:3.10-slim
+# Dùng image chính thức của Playwright (đã có Chromium và headless hỗ trợ)
+FROM mcr.microsoft.com/playwright/python:v1.43.1-jammy
 
 WORKDIR /app
-COPY . /app
 
-RUN apt-get update && apt-get install -y curl && \
-    pip install --no-cache-dir -r requirements.txt && \
-    python -m playwright install --with-deps
+COPY . .
 
-EXPOSE 8000
+RUN pip install --upgrade pip \
+    && pip install -r requirements.txt \
+    && playwright install --with-deps
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+ENV PORT=8000
+
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
